@@ -7,7 +7,7 @@
 
   #define MODULE_EXTENSION ".dll"
 
-  ModuleInstance ModuleInstance_load (char const* path) {
+  static inline ModuleInstance ModuleInstance_load (char const* path) {
     ModuleInstance module = LoadLibraryA(path);
 
     m_assert(module != NULL, "Failed to load Module at path '%s'", path);
@@ -15,11 +15,11 @@
     return module;
   }
 
-  void ModuleInstance_unload (ModuleInstance module) {
+  static inline void ModuleInstance_unload (ModuleInstance module) {
     m_assert(FreeLibrary(module) != 0, "Failed to unload Module");
   }
 
-  void* ModuleInstance_get_address (ModuleInstance module, char const* name) {
+  static inline void* ModuleInstance_get_address (ModuleInstance module, char const* name) {
     return GetProcAddress(module, name);
   }
 #else
@@ -29,7 +29,7 @@
 
   #define MODULE_EXTENSION ".so"
 
-  ModuleInstance ModuleInstance_load (char const* path) {
+  static inline ModuleInstance ModuleInstance_load (char const* path) {
     void* module = dlopen(path, RTLD_LAZY);
 
     m_assert(module != NULL, "Failed to load Module at path '%s'", path);
@@ -37,11 +37,11 @@
     return module;
   }
 
-  void ModuleInstance_unload (ModuleInstance module) {
+  static inline void ModuleInstance_unload (ModuleInstance module) {
     m_assert(dlclose(module) == 0, "Failed to unload Module");
   }
 
-  void* ModuleInstance_get_address (ModuleInstance module, char const* name) {
+  static inline void* ModuleInstance_get_address (ModuleInstance module, char const* name) {
     return dlsym(module, name);
   }
 #endif
